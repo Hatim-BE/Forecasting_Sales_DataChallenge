@@ -1,7 +1,17 @@
-# 1 Functions
+import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.neural_network import MLPRegressor
+import pandas as pd
+from catboost import CatBoostClassifier
+from sklearn.model_selection import train_test_split, KFold, LeaveOneOut, TimeSeriesSplit
+from sklearn.metrics import classification_report
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler, RobustScaler, LabelEncoder, OrdinalEncoder
 
-## A/ Creation
-### create_df
+
 def create_df(path):
     df = pd.read_csv(path)
     return df
@@ -130,17 +140,11 @@ def impute_column_randomly(df, column):
 
     return df
 
+def replace_marque(row):
+    if pd.isna(row['marque']) and row['id_produit'] in marque_to_product:
+        return marque_to_product[row['id_produit']][0]  # Replace with first marque if found
+    return row['marque']  # Keep the original marque if not found
 
-
-
-### Imputations using ML
-import pandas as pd
-import numpy as np
-from sklearn.impute import SimpleImputer, KNNImputer
-from sklearn.experimental import enable_iterative_imputer
-from sklearn.impute import IterativeImputer
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
-from sklearn.neural_network import MLPRegressor
 
 def ML_impute(df, option):
     df_imputed = df.copy()
@@ -205,11 +209,6 @@ def ML_impute(df, option):
     return df_imputed
 
 
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
-import pandas as pd
-import numpy as np
-
 def impute_nums_ml(df, target_col, predictor_cols, model_type='linear'):
     """
     Impute missing values in a target column using a predictive model,
@@ -268,10 +267,6 @@ def impute_nums_ml(df, target_col, predictor_cols, model_type='linear'):
     print(f"Missing values in '{target_col}' have been imputed using {model_type} model.")
     return df
 
-import pandas as pd
-from catboost import CatBoostClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
 
 def impute_catrgories_ml(df, target, predictors):
     """
@@ -335,7 +330,6 @@ def one_hot_encode(df, columns, drop_f=False):
     return encoded_df, new_columns
 
 #### Label Encoding
-from sklearn.preprocessing import LabelEncoder
 
 def label_encode(df, columns):
     encoded_df = df.copy()
@@ -400,18 +394,13 @@ def frequency_encoding(df, column_name):
     df[column_name] = df[column_name].map(freq_encoding)
 
     return df
-from sklearn.preprocessing import OrdinalEncoder
 
 def ordinal_encode(df, column):
     encoded_df = df.copy()
     ordinal_encoder = OrdinalEncoder()
     encoded_df[column] = ordinal_encoder.fit_transform(encoded_df[[column]])
     return encoded_df
-### b/ Feature scaling
-from sklearn.preprocessing import MaxAbsScaler
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import RobustScaler
+
 
 def feature_scaling(df, columns, option):
     scaled_df = df.copy()
@@ -522,8 +511,6 @@ def winsorize(df, column, upper = 75, lower = 25):
 
     return capped_df
 ## D/ Cross validation
-from sklearn.model_selection import KFold
-from sklearn.model_selection import LeaveOneOut
 
 
 def tr_te_split(df, test_size = 0.2):
@@ -546,7 +533,6 @@ def leave_one_out_split(df):
       test = df.iloc[test_index]
       yield train, test
 
-from sklearn.model_selection import TimeSeriesSplit
 
 def time_series_kfold_split(df, n_splits=5):
   tscv = TimeSeriesSplit(n_splits=n_splits)
