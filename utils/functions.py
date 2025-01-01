@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer
+from sklearn.experimental import enable_iterative_imputer
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.neural_network import MLPRegressor
 import pandas as pd
@@ -497,19 +497,21 @@ def plot_histograms(df_train, df_test, target_col, n_cols=3):
     plt.tight_layout()
     plt.show()
 ### Outliers capping
-def winsorize(df, columns:list, upper = 75, lower = 25):
+def winsorize(df, column, upper = 75, lower = 25):
     capped_df = df.copy()
-    for column in columns:
-            perc_upper = np.percentile(capped_df[column], upper)
-            perc_lower = np.percentile(capped_df[column], lower)
+    col_df = capped_df[column]
 
-            capped_df[column] = np.where(capped_df[column] >= perc_upper,
-                                         perc_upper,
-                                         capped_df[column])
+    perc_upper = np.percentile(capped_df[column],upper)
+    perc_lower = np.percentile(capped_df[column],lower)
 
-            capped_df[column] = np.where(capped_df[column] <= perc_lower,
-                                         perc_lower,
-                                         capped_df[column])
+    capped_df[column] = np.where(capped_df[column] >= perc_upper,
+                          perc_upper,
+                          capped_df[column])
+
+    capped_df[column] = np.where(capped_df[column] <= perc_lower,
+                          perc_lower,
+                          capped_df[column])
+
     return capped_df
 ## D/ Cross validation
 
@@ -548,11 +550,3 @@ def time_series_kfold_split(df, n_splits=5):
 # Define MAPE function
 def mape_function(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true))
-
-
-# Function to transform 'date' column to relevant datetime features
-def add_date_features(df):
-    df["month"] = df["date"].dt.month
-    df["day"] = df["date"].dt.day
-    df["quarter"] = df["date"].dt.quarter
-    return df
