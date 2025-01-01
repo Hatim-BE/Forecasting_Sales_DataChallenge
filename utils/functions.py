@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
@@ -10,6 +12,7 @@ from sklearn.model_selection import train_test_split, KFold, LeaveOneOut, TimeSe
 from sklearn.metrics import classification_report
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler, RobustScaler, LabelEncoder, OrdinalEncoder
+from xgboost import XGBRegressor
 
 
 def create_df(path):
@@ -140,9 +143,9 @@ def impute_column_randomly(df, column):
 
     return df
 
-def replace_marque(row):
-    if pd.isna(row['marque']) and row['id_produit'] in marque_to_product:
-        return marque_to_product[row['id_produit']][0]  # Replace with first marque if found
+def replace_marque(row, marque_mapping):
+    if pd.isna(row['marque']) and row['id_produit'] in marque_mapping:
+        return marque_mapping[row['id_produit']][0]  # Replace with first marque if found
     return row['marque']  # Keep the original marque if not found
 
 
