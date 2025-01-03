@@ -5,6 +5,7 @@ import seaborn as sns
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from category_encoders import TargetEncoder
 from sklearn.neural_network import MLPRegressor
 import pandas as pd
 from catboost import CatBoostClassifier
@@ -556,3 +557,22 @@ def add_date_features(df):
     df["day"] = df["date"].dt.day
     df["quarter"] = df["date"].dt.quarter
     return df
+
+def encode_features(X_train, y_train, X_test, submission_df, target_encode_columns=['id_produit', 'marque', 'categorie'], label_encode_columns=['condition_meteo', 'region', 'moment_journee'], smoothing=7):
+    
+    # Target Encoding
+    for col in target_encode_columns:
+        target_encoder = TargetEncoder(cols=[col], smoothing=smoothing)
+        X_train[col] = target_encoder.fit_transform(X_train[col], y_train)
+        X_test[col] = target_encoder.transform(X_test[col])
+        submission_df[col] = target_encoder.transform(submission_df[col])
+
+    # Label Encoding
+    for col in label_encode_columns:
+        lbl = LabelEncoder()
+        lbl.fit(X_train[col])  # Fit on training data
+        X_train[col] = lbl.transform(X_train[col])
+        X_test[col] = lbl.transform(X_test[col])
+        submission_df[col] = lbl.transform(submission_df[col])
+
+    return X_train, X_test, submission_df
