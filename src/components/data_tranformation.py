@@ -92,6 +92,17 @@ class CustomColumnDropper(BaseEstimator, TransformerMixin):
     def transform(self, X):
         X_copy = X.copy()
         return X_copy.drop(columns=self.columns_to_drop)
+
+class CustomNullValuesDropper(BaseEstimator, TransformerMixin):
+    def __init__(self, columns):
+        self.columns = columns
+        
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X):
+        X_copy = X.copy()
+        return X_copy.dropna(subset=self.columns)
+    
 # Custom Imputation for "jour_ferie"
 class ImputeJourFerie(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
@@ -222,7 +233,7 @@ class DataTransformation:
             
             train_arr = preprocessing_obj.fit_transform(train_df_without_target)
             test_arr = preprocessing_obj.transform(test_df_without_target)            
-            # submission_arr=preprocessing_obj.transform(submission_df)
+            submission_arr = preprocessing_obj.transform(submission_df)
             save_object(
                 file_path=self.data_transformation_config.preprocessor_obj_file_path,
                 obj=preprocessing_obj
@@ -232,12 +243,32 @@ class DataTransformation:
 
             train_transformed_df = pd.DataFrame(train_arr, columns=tranformed_columns)
             train_transformed_df[target] = train_df[target]
-            train_transformed_df.to_csv(self.data_transformation_config.transf_train_data_path, index=False, header=True)
+            train_transformed_df = drop_null_values_columns(train_transformed_df, ["id_produit", "quantite_vendue"])
 
             test_transformed_df = pd.DataFrame(test_arr, columns=tranformed_columns)
             test_transformed_df[target] = test_df[target]
+            test_transformed_df = drop_null_values_columns(train_transformed_df, ["id_produit", "quantite_vendue"])
+            
+            submission_transformed_df = pd.DataFrame(submission_arr, columns=tranformed_columns)
+
+            X_train, y_train = train_transformed_df.drop(columns=["quantite_vendue"]), train_transformed_df["quantite_vendue"]
+            X_test, y_test = test_transformed_df.drop(columns=["quantite_vendue"]), test_transformed_df["quantite_vendue"]
+
+
+            # Call the encoding function
+            X_train, X_test, submission_transformed_df = encode_features(
+                X_train, y_train, X_test, submission_transformed_df
+            )
+            
+            # Convert to float
+            X_train, X_test, submission_transformed_df = convert_object_to_float(X_train, X_test, submission_transformed_df)
+            
+            train_transformed_df = pd.concat([X_train, y_train], axis=1)
+            test_transformed_df = pd.concat([X_test, y_test], axis=1)
+            
+            train_transformed_df.to_csv(self.data_transformation_config.transf_train_data_path, index=False, header=True)
             test_transformed_df.to_csv(self.data_transformation_config.transf_test_data_path, index=False, header=True)
-            # pd.DataFrame(submission_arr).to_csv(self.data_transformation_config.transf_submission_data_path, index=False, header=True)
+            submission_transformed_df.to_csv(self.data_transformation_config.transf_submission_data_path, index=False, header=True)
             logging.info(f"Saved tranformed data.")
             return (
                 train_arr,
