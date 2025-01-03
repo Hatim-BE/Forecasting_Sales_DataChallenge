@@ -183,7 +183,7 @@ class DataTransformation:
                     ("fill_stock", FillStock()),
                     ("log_transform", LogTransform()),
                     ("random_fill_categorical", RandomFillCategorical(columns=['condition_meteo', 'moment_journee', 'region'])),
-                    ("drop_columns", CustomColumnDropper(columns_to_drop=["date"])),
+                    ("drop_columns", CustomColumnDropper(columns_to_drop=["date", "Unnamed: 0"])),
                     ("winsorize", WinsorizeColumn(columns=["prix_unitaire", "stock_disponible"], upper=85, lower=15)),
                 ]
             )
