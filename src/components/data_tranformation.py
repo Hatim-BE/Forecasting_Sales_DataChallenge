@@ -200,17 +200,28 @@ class DataTransformation:
             raise CustomException(e, sys)
     def initiate_data_transformation(self, train_path, test_path, submission_path):
         try:
+            target = "quantite_vendue"
             train_df=pd.read_csv(train_path)
             test_df=pd.read_csv(test_path)
             submission_df=pd.read_csv(submission_path)
+
+            target_column = train_df['quantite_vendue']
+            ['Unnamed: 0', 'id_produit', 'date', 'categorie', 'marque', 'prix_unitaire', 'promotion', 'jour_ferie', 'weekend', 'stock_disponible', 'condition_meteo', 'region', 'moment_journee', 'month', 'day', 'quarter']
+            ['Unnamed: 0', 'id_produit', 'date', 'categorie', 'marque', 'prix_unitaire', 'promotion', 'jour_ferie', 'weekend', 'stock_disponible', 'condition_meteo', 'region', 'moment_journee']
+            # Remove the target column from the original data for transformation
+            train_df_without_target = train_df.drop(columns=['quantite_vendue'])
+            test_df_without_target = test_df.drop(columns=['quantite_vendue'])
+
+            # Define your transformed columns (without the target column for now)
+            tranformed_columns = list(train_df_without_target.drop(["date", "Unnamed: 0"], axis=1).columns) + ["month", "day", "quarter"]            
+
             logging.info("Read train and test data completed")
             logging.info("Obtaining preprocessing object")
-            preprocessing_obj=self.get_data_transformer_object(train_df.columns)
-            logging.info(
-                f"Applying preprocessing object on training dataframe and testing dataframe."
-            )
-            train_arr=preprocessing_obj.fit_transform(train_df)
-            test_arr=preprocessing_obj.transform(test_df)
+            preprocessing_obj=self.get_data_transformer_object(train_df_without_target.columns)
+            logging.info(f"Applying preprocessing object on training dataframe and testing dataframe.")
+            
+            train_arr = preprocessing_obj.fit_transform(train_df_without_target)
+            test_arr = preprocessing_obj.transform(test_df_without_target)            
             # submission_arr=preprocessing_obj.transform(submission_df)
             save_object(
                 file_path=self.data_transformation_config.preprocessor_obj_file_path,
@@ -218,10 +229,14 @@ class DataTransformation:
             )
             logging.info(f"Saved preprocessing object.")
             os.makedirs(os.path.dirname(self.data_transformation_config.transf_train_data_path), exist_ok=True)
-            
-            pd.DataFrame(train_arr).to_csv(self.data_transformation_config.transf_train_data_path, index=False, header=True)
-            print(pd.DataFrame(train_arr).columns)
-            pd.DataFrame(test_arr).to_csv(self.data_transformation_config.transf_test_data_path, index=False, header=True)
+
+            train_transformed_df = pd.DataFrame(train_arr, columns=tranformed_columns)
+            train_transformed_df[target] = train_df[target]
+            train_transformed_df.to_csv(self.data_transformation_config.transf_train_data_path, index=False, header=True)
+
+            test_transformed_df = pd.DataFrame(test_arr, columns=tranformed_columns)
+            test_transformed_df[target] = test_df[target]
+            test_transformed_df.to_csv(self.data_transformation_config.transf_test_data_path, index=False, header=True)
             # pd.DataFrame(submission_arr).to_csv(self.data_transformation_config.transf_submission_data_path, index=False, header=True)
             logging.info(f"Saved tranformed data.")
             return (
