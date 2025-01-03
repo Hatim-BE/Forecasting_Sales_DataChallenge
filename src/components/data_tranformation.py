@@ -157,10 +157,10 @@ class WinsorizeColumn(BaseEstimator, TransformerMixin):
         return X_copy
 @dataclass
 class DataTransformationConfig:
-    preprocessor_obj_file_path=os.path.join('artifacts',"proprocessor.pkl")
-    transf_train_data_path: str = os.path.join('artifacts', 'transformed', 'transformed_train.csv')
-    transf_test_data_path: str = os.path.join('artifacts', 'transformed', 'transformed_test.csv')
-    transf_submission_data_path: str = os.path.join('artifacts', 'transformed', 'transformed_submission.csv')
+    preprocessor_obj_file_path=os.path.join('artifacts', 'preprocessor', "preprocessor.pkl")
+    transf_train_data_path: str = os.path.join('artifacts', 'transformed_data', 'transformed_train.csv')
+    transf_test_data_path: str = os.path.join('artifacts', 'transformed_data', 'transformed_test.csv')
+    transf_submission_data_path: str = os.path.join('artifacts', 'transformed_data', 'transformed_submission.csv')
     
 # Custom DataTransformer class to integrate all transformations
 class DataTransformation:
