@@ -17,3 +17,24 @@ def save_object(file_path, obj):
 
     except Exception as e:
         raise CustomException(e, sys)
+    
+def load_params(file_path=None):
+    try:
+        with open(file_path, "rb") as file_obj:
+            best_models = pickle.load(file_obj)
+        print(f"Best models loaded from {file_path}")
+        return best_models
+    except Exception as e:
+        raise CustomException(f"Error loading {file_path}: {e}", sys)
+
+def load_object(file_path):
+    try:
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"No file found at path: {file_path}")
+        
+        with open(file_path, "rb") as file_obj:
+            obj = pickle.load(file_obj)
+        return obj
+
+    except Exception as e:
+        raise CustomException(e, sys)

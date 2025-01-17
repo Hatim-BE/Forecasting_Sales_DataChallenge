@@ -576,3 +576,9 @@ def encode_features(X_train, y_train, X_test, submission_df, target_encode_colum
         submission_df[col] = lbl.transform(submission_df[col])
 
     return X_train, X_test, submission_df
+
+def convert_object_to_float(*dfs):
+    for df in dfs:
+        for col in df.select_dtypes(include="object").columns:
+            df[col] = df[col].astype(float)
+    return dfs
