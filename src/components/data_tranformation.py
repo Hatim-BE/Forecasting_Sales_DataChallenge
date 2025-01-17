@@ -247,7 +247,7 @@ class DataTransformation:
 
             test_transformed_df = pd.DataFrame(test_arr, columns=tranformed_columns)
             test_transformed_df[target] = test_df[target]
-            test_transformed_df = drop_null_values_columns(train_transformed_df, ["id_produit", "quantite_vendue"])
+            test_transformed_df = drop_null_values_columns(test_transformed_df, ["id_produit", "quantite_vendue"])
             
             submission_transformed_df = pd.DataFrame(submission_arr, columns=tranformed_columns)
 
@@ -271,8 +271,9 @@ class DataTransformation:
             submission_transformed_df.to_csv(self.data_transformation_config.transf_submission_data_path, index=False, header=True)
             logging.info(f"Saved tranformed data.")
             return (
-                train_arr,
-                test_arr,
+                train_transformed_df,
+                test_transformed_df,
+                submission_transformed_df,
                 self.data_transformation_config.preprocessor_obj_file_path,
             )
         except Exception as e:
