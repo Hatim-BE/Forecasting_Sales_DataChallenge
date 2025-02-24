@@ -1,0 +1,92 @@
+<html>
+    <body>
+        <div class="login">
+           <h1>Product Sales Prediction</h1>
+       
+           <form action="{{ url_for('predict_datapoint')}}" method="post">
+                <h1>
+                    <legend>Predict Product Sales</legend>
+                </h1>
+
+                <div class="mb-3">
+                    <label class="form-label">Product ID</label>
+                    <input class="form-control" type="text" name="id_produit" placeholder="Enter Product ID" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Date</label>
+                    <input class="form-control" type="date" name="date" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <input class="form-control" type="text" name="categorie" placeholder="Enter Category" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Brand</label>
+                    <input class="form-control" type="text" name="marque" placeholder="Enter Brand" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Unit Price</label>
+                    <input class="form-control" type="number" step="0.01" name="prix_unitaire" placeholder="Enter Unit Price" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Promotion Discount</label>
+                    <select class="form-control" name="jour_ferie" required>
+                        <option selected disabled value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Public Holiday</label>
+                    <select class="form-control" name="jour_ferie" required>
+                        <option selected disabled value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Weekend</label>
+                    <select class="form-control" name="weekend" required>
+                        <option selected disabled value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Stock Available</label>
+                    <input class="form-control" type="number" name="stock_disponible" placeholder="Enter Stock Available" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Weather Condition</label>
+                    <input class="form-control" type="text" name="condition_meteo" placeholder="Enter Weather Condition" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Region</label>
+                    <input class="form-control" type="text" name="region" placeholder="Enter Region" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Time of Day</label>
+                    <input class="form-control" type="text" name="moment_journee" placeholder="Enter Time of Day" required />
+                </div>
+
+                <div class="mb-3">
+                    <input class="btn btn-primary" type="submit" value="Predict Sales Quantity" required />
+                </div>
+            </form>
+
+            <h2>
+                The predicted quantity sold is {{ results }}
+            </h2>
+        </div>
+    </body>
+</html>
