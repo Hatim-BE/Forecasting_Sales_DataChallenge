@@ -21,6 +21,7 @@ def predict_datapoint():
         return render_template('home.html')
     else:
         data=CustomData(
+            Unnamed = 0,
             id_produit =  request.form.get("id_produit"),
             date =  request.form.get("date"),
             categorie =  request.form.get("categorie"),
@@ -42,9 +43,10 @@ def predict_datapoint():
         print("Mid Prediction")
         results=predict_pipeline.predict(pred_df)
         print("after Prediction")
-        return render_template('home.html',results=results[0])
+        return render_template('index.html',results=results[0])
     
 
-if __name__=="__main__":
-    app.run(host="0.0.0.0")        
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", debug=True)  
+
 
